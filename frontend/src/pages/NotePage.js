@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ReactComponent as ArrowLeft } from "../assets/arrow-left.svg";
 
-const NotePage = () => {
+const NotePage = ({ history }) => {
   // useParams()はurlで指定した変数を取ってくるので、/note/:idとした場合、
   // const { id }にする必要がある。
   const { id } = useParams();
@@ -13,9 +13,24 @@ const NotePage = () => {
   }, [id]);
 
   const getNote = async () => {
-    const response = await fetch(`/api/notes/${id}`);
+    const response = await fetch(`/api/notes/${id}/`);
     const data = await response.json();
     setNote(data);
+  };
+
+  const updateNote = async () => {
+    fetch(`/api/notes/${id}/update/`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(note),
+    });
+  };
+
+  const handleSubmit = async () => {
+    await updateNote();
+    history.push("/");
   };
 
   return (
@@ -23,12 +38,17 @@ const NotePage = () => {
       {/* noteがnullまたundefinedの場合にエラーが発生しないようにnote?にする */}
       <div className="note-header">
         <h3>
-          <Link to="/">
-            <ArrowLeft />
-          </Link>
+          <h3>
+            <ArrowLeft onClick={handleSubmit} />
+          </h3>
         </h3>
       </div>
-      <textarea defaultValue={note?.body}></textarea>
+      <textarea
+        onChange={(e) => {
+          setNote({ ...note, body: e.target.value });
+        }}
+        defaultValue={note?.body}
+      ></textarea>
     </div>
   );
 };
