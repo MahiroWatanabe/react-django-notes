@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { ReactComponent as ArrowLeft } from "../assets/arrow-left.svg";
 
 const NotePage = () => {
   // useParams()はurlで指定した変数を取ってくるので、/note/:idとした場合、
@@ -18,9 +19,16 @@ const NotePage = () => {
   };
 
   return (
-    <div>
+    <div className="note">
       {/* noteがnullまたundefinedの場合にエラーが発生しないようにnote?にする */}
-      <h1>{note?.body}</h1>
+      <div className="note-header">
+        <h3>
+          <Link to="/">
+            <ArrowLeft />
+          </Link>
+        </h3>
+      </div>
+      <textarea defaultValue={note?.body}></textarea>
     </div>
   );
 };
