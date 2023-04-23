@@ -4,9 +4,10 @@ from rest_framework.decorators import api_view
 from .models import Note
 from .serializers import NoteSerializer
 
+
 @api_view(['GET'])
 def getRoutes(request):
-    
+
     routes = [
         {
             'Endpoint': '/notes/',
@@ -39,19 +40,35 @@ def getRoutes(request):
             'description': 'Deletes and exiting note'
         },
     ]
-    
+
     return Response(routes)
+
 
 @api_view(['GET'])
 def getNotes(request):
     # many=Falesの場合はnotesが単一のオブジェクトでなければならない
     notes = Note.objects.all()
-    serializer = NoteSerializer(notes,many=True)
+    serializer = NoteSerializer(notes, many=True)
     return Response(serializer.data)
 
+
 @api_view(['GET'])
-def getNote(request,pk):
+def getNote(request, pk):
     # many=Falesの場合はnotesが単一のオブジェクトでなければならない
     note = Note.objects.get(id=pk)
-    serializer = NoteSerializer(note,many=False)
+    serializer = NoteSerializer(note, many=False)
+    return Response(serializer.data)
+
+# PUTは更新
+@api_view(['PUT'])
+def updateNote(request, pk):
+    data = request.data
+    note = Note.objects.get(id=pk)
+    # instanceに指定するのが更新前データ、dataにしていするのが更新後データ
+    # データベースに保存するには、.sava()メソッドを実行する
+    serializer = NoteSerializer(instance=note, data=data)
+    
+    if serializer.is_valid():
+        serializer.save()
+        
     return Response(serializer.data)
