@@ -46,8 +46,10 @@ def getRoutes(request):
 
 @api_view(['GET'])
 def getNotes(request):
+    # 取得したNoteオブジェクトを更新したのが遅い順（大きい順、降順）
+    # に並び替える
+    notes = Note.objects.all().order_by('-updated')
     # many=Falesの場合はnotesが単一のオブジェクトでなければならない
-    notes = Note.objects.all()
     serializer = NoteSerializer(notes, many=True)
     return Response(serializer.data)
 
@@ -59,6 +61,13 @@ def getNote(request, pk):
     serializer = NoteSerializer(note, many=False)
     return Response(serializer.data)
 
+@api_view(['POST'])
+def createNote(request):
+    data = request.data
+    note = Note.objects.create(body=data['body'])
+    serializer = NoteSerializer(note, many=False)
+    return Response(serializer.data)
+    
 # PUTは更新
 @api_view(['PUT'])
 def updateNote(request, pk):
@@ -67,8 +76,14 @@ def updateNote(request, pk):
     # instanceに指定するのが更新前データ、dataにしていするのが更新後データ
     # データベースに保存するには、.sava()メソッドを実行する
     serializer = NoteSerializer(instance=note, data=data)
-    
+
     if serializer.is_valid():
         serializer.save()
-        
+
     return Response(serializer.data)
+
+@api_view(['DELETE'])
+def deleteNote(request, pk):
+    note = Note.objects.get(id=pk)
+    note.delete()
+    return Response('Note was deleted!')
