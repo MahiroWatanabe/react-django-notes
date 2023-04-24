@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ReactComponent as ArrowLeft } from "../assets/arrow-left.svg";
 
-const NotePage = ({ history }) => {
+const NotePage = () => {
   // useParams()はurlで指定した変数を取ってくるので、/note/:idとした場合、
   // const { id }にする必要がある。
   const { id } = useParams();
+  const navigate = useNavigate();
   const [note, setNote] = useState(null);
 
   useEffect(() => {
@@ -30,7 +31,7 @@ const NotePage = ({ history }) => {
 
   const handleSubmit = async () => {
     await updateNote();
-    history.push("/");
+    navigate("/");
   };
 
   return (
@@ -38,9 +39,7 @@ const NotePage = ({ history }) => {
       {/* noteがnullまたundefinedの場合にエラーが発生しないようにnote?にする */}
       <div className="note-header">
         <h3>
-          <h3>
-            <ArrowLeft onClick={handleSubmit} />
-          </h3>
+          <ArrowLeft onClick={handleSubmit} />
         </h3>
       </div>
       <textarea
