@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Note
 from .serializers import NoteSerializer
-
+from .utils import *
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -43,47 +43,23 @@ def getRoutes(request):
 
     return Response(routes)
 
-
-@api_view(['GET'])
+@api_view(['GET','POST'])
 def getNotes(request):
-    # 取得したNoteオブジェクトを更新したのが遅い順（大きい順、降順）
-    # に並び替える
-    notes = Note.objects.all().order_by('-updated')
-    # many=Falesの場合はnotesが単一のオブジェクトでなければならない
-    serializer = NoteSerializer(notes, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getNote(request, pk):
-    # many=Falesの場合はnotesが単一のオブジェクトでなければならない
-    note = Note.objects.get(id=pk)
-    serializer = NoteSerializer(note, many=False)
-    return Response(serializer.data)
-
-@api_view(['POST'])
-def createNote(request):
-    data = request.data
-    note = Note.objects.create(body=data['body'])
-    serializer = NoteSerializer(note, many=False)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        return getNotesList(request)
+    
+    if request.method == 'POST':
+        return createNote(request)
     
 # PUTは更新
-@api_view(['PUT'])
-def updateNote(request, pk):
-    data = request.data
-    note = Note.objects.get(id=pk)
-    # instanceに指定するのが更新前データ、dataにしていするのが更新後データ
-    # データベースに保存するには、.sava()メソッドを実行する
-    serializer = NoteSerializer(instance=note, data=data)
-
-    if serializer.is_valid():
-        serializer.save()
-
-    return Response(serializer.data)
-
-@api_view(['DELETE'])
-def deleteNote(request, pk):
-    note = Note.objects.get(id=pk)
-    note.delete()
-    return Response('Note was deleted!')
+@api_view(['GET','PUT','DELETE'])
+def getNote(request, pk):
+    
+    if request.method == 'GET':
+        return getNoteDetail(request,pk)
+    
+    if request.method == 'PUT':
+        return updateNote(request,pk)
+    
+    if request.method == 'DELETE':
+        return deleteNote(request,pk)
