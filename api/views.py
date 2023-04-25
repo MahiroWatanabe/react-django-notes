@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from .models import Note
 from .serializers import NoteSerializer
 from .utils import *
+from django.views.decorators.csrf import csrf_exempt
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -43,6 +44,7 @@ def getRoutes(request):
 
     return Response(routes)
 
+@csrf_exempt
 @api_view(['GET','POST'])
 def getNotes(request):
     if request.method == 'GET':
@@ -52,6 +54,7 @@ def getNotes(request):
         return createNote(request)
     
 # PUTは更新
+@csrf_exempt
 @api_view(['GET','PUT','DELETE'])
 def getNote(request, pk):
     

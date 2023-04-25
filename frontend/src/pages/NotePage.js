@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ReactComponent as ArrowLeft } from "../assets/arrow-left.svg";
+import Cookies from 'js-cookie';
 
 const NotePage = () => {
   // useParams()はurlで指定した変数を取ってくるので、/note/:idとした場合、
@@ -21,30 +22,36 @@ const NotePage = () => {
   };
 
   const updateNote = async () => {
+    const csrftoken = Cookies.get('csrftoken');
     fetch(`/api/notes/${id}/`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken
       },
       body: JSON.stringify(note),
     });
   };
 
   const createNote = async () => {
+    const csrftoken = Cookies.get('csrftoken');
     fetch(`/api/notes/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken
       },
       body: JSON.stringify(note),
     });
   };
-
+  
   const deleteNote = async () => {
+    const csrftoken = Cookies.get('csrftoken');
     fetch(`/api/notes/${id}/`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken
       },
     });
     navigate("/");
